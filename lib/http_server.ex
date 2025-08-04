@@ -3,16 +3,15 @@ defmodule HttpServer do
   Documentation for `HttpServer`.
   """
 
-  @doc """
-  Hello world.
+  use Application
 
-  ## Examples
+  @doc false
+  def start(_type, _args) do
+    children = [
+      {HttpServer.Socket, [port: 8080]}
+    ]
 
-      iex> HttpServer.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    opts = [strategy: :one_for_one, name: HttpServer.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
