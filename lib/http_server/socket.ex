@@ -12,15 +12,14 @@ defmodule HttpServer.Socket do
     {:ok, request} = :gen_tcp.accept(socket)
 
     spawn(fn ->
-      body = "Hello World!\nThe time is #{Time.to_string(Time.utc_now())}"
+      body = "Hello World! The time is #{Time.to_string(Time.utc_now())}"
 
-      response = """
-        HTTP/1.1 200\r\n
-        Content-Type: text/html\r\n
-        Content-Length: #{byte_size(body)}\r\n
-        \r\n
-        #{body}
-      """
+      response =
+        "HTTP/1.1 200 OK\r\n" <>
+          "Content-Type: text/html\r\n" <>
+          "Content-Length: #{byte_size(body)}\r\n" <>
+          "\r\n" <>
+          body
 
       send_response(request, response)
     end)
