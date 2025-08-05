@@ -1,30 +1,21 @@
 defmodule HttpServer.Socket do
   require Logger
 
-  def start_link(port: port) do
+  def start_link(port: port, dispatch: dispatch) do
     {:ok, socket} = :gen_tcp.listen(port, active: false, packet: :http_bin, reuseaddr: true)
     Logger.info("Accepting connections on port #{port}")
 
-    {:ok, spawn_link(__MODULE__, :accept, [socket])}
+    {:ok, spawn_link(__MODULE__, :accept, [socket, dispatch])}
   end
 
-  def accept(socket) do
+  def accept(socket, dispatch) do
     {:ok, request} = :gen_tcp.accept(socket)
 
     spawn(fn ->
-      body = "Hello World! The time is #{Time.to_string(Time.utc_now())}"
-
-      response =
-        "HTTP/1.1 200 OK\r\n" <>
-          "Content-Type: text/html\r\n" <>
-          "Content-Length: #{byte_size(body)}\r\n" <>
-          "\r\n" <>
-          body
-
-      send_response(request, response)
+      dispatch.(request)
     end)
 
-    accept(socket)
+    accept(socket, dispatch)
   end
 
   def send_response(socket, response) do

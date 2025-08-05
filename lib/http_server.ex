@@ -8,7 +8,7 @@ defmodule HttpServer do
   @doc false
   def start(_type, _args) do
     children = [
-      {HttpServer.Socket, [port: 8080]}
+      {HttpServer.Adapter, [plug: CurrentTime, port: 8080]}
     ]
 
     opts = [strategy: :one_for_one, name: HttpServer.Supervisor]
